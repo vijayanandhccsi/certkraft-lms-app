@@ -16,7 +16,8 @@ import AdminInstructors from './pages/admin/AdminInstructors';
 import AdminContent from './pages/admin/AdminContent'; 
 import AdminLabs from './pages/admin/AdminLabs';
 import AdminMediaLibrary from './pages/admin/AdminMediaLibrary';
-import AdminStudents from './pages/admin/AdminStudents'; // New Import
+import AdminStudents from './pages/admin/AdminStudents'; 
+import AdminSettings from './pages/admin/AdminSettings'; // New Import
 // Student Imports
 import StudentLayout from './pages/student/StudentLayout';
 import StudentDashboard from './pages/student/StudentDashboard';
@@ -30,7 +31,7 @@ import { LearningPathProvider } from './contexts/LearningPathContext';
 import { InstructorProvider } from './contexts/InstructorContext';
 import { CourseProvider } from './contexts/CourseContext'; 
 import { StudentProvider } from './contexts/StudentContext'; 
-import { AdminStudentProvider } from './contexts/AdminStudentContext'; // New Import
+import { AdminStudentProvider } from './contexts/AdminStudentContext'; 
 
 // Public Layout to include Navbar and Footer
 const PublicLayout = () => (
@@ -88,7 +89,7 @@ const App: React.FC = () => {
                       <Route path="labs" element={<AdminLabs />} />
                       <Route path="media" element={<AdminMediaLibrary />} />
                       <Route path="students" element={<AdminStudents />} />
-                      <Route path="settings" element={<div className="p-4">System Settings (Coming Soon)</div>} />
+                      <Route path="settings" element={<AdminSettings />} />
                     </Route>
                   </Routes>
                 </div>
