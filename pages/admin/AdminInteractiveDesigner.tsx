@@ -8,12 +8,12 @@ import {
   Upload, Move, FileText as FileIcon,
   PieChart, Gamepad2, GraduationCap, ClipboardList, Film, Share2, BookOpen, Grid, ChevronDown, ChevronRight,
   Palette, MousePointer2, Box, Star, Link as LinkIcon, Square, LayoutTemplate,
-  Undo, Redo, Smartphone, Monitor, ZoomIn, ZoomOut, Maximize
+  Undo, Redo, Smartphone, Monitor, ZoomIn, ZoomOut, Maximize, RectangleHorizontal
 } from 'lucide-react';
 
 // --- TYPES ---
 
-type BlockType = 'heading' | 'text' | 'image' | 'video' | 'mcq' | 'process' | 'flashcard' | 'hotspot' | 'list' | 'code' | 'button' | 'icon' | 'embed';
+type BlockType = 'heading' | 'text' | 'image' | 'video' | 'mcq' | 'process' | 'flashcard' | 'hotspot' | 'list' | 'code' | 'button' | 'icon' | 'embed' | 'banner';
 
 interface BlockConfig {
   [key: string]: any;
@@ -155,6 +155,20 @@ const MOCK_PAGES: InteractivePage[] = [
           correctOptionId: 'opt1',
           feedback: 'Correct! Ping is the best first step to verify basic connectivity.' 
         } 
+      },
+      {
+        id: 'b4',
+        type: 'mcq',
+        content: {
+          question: 'Which cloud provider offers the most extensive global infrastructure?',
+          options: [
+            { id: 'opt_aws', text: 'AWS' },
+            { id: 'opt_azure', text: 'Azure' },
+            { id: 'opt_gcp', text: 'GCP' }
+          ],
+          correctOptionId: 'opt_aws',
+          feedback: 'AWS has the largest number of regions and availability zones.'
+        }
       }
     ]
   }
@@ -426,8 +440,14 @@ const AdminInteractiveDesigner: React.FC = () => {
         size: 48
       }; break;
       case 'embed': defaultContent = {
-        url: 'https://example.com',
+        url: 'https://www.wikipedia.org',
         height: 400
+      }; break;
+      case 'banner': defaultContent = {
+        url: 'https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2000&auto=format&fit=crop',
+        height: 250,
+        text: 'Banner Title',
+        overlayOpacity: 0.3
       }; break;
     }
 
@@ -799,6 +819,54 @@ const AdminInteractiveDesigner: React.FC = () => {
           </div>
         );
 
+      case 'banner':
+        return (
+          <div 
+            className={`relative group/banner -mx-12 ${isSelected ? 'ring-2 ring-indigo-600 z-10' : ''}`}
+            style={{ height: block.content.height || 250, width: 'calc(100% + 6rem)' }}
+          >
+             <div 
+               className="absolute inset-0 bg-cover bg-center"
+               style={{ backgroundImage: `url(${block.content.url})` }}
+             />
+             <div 
+               className="absolute inset-0 bg-black"
+               style={{ opacity: block.content.overlayOpacity ?? 0.3 }}
+             />
+             <div className="absolute inset-0 flex items-center justify-center p-8">
+                <InlineRichText 
+                   tagName="h2"
+                   className="text-4xl font-bold text-white text-center drop-shadow-lg"
+                   value={block.content.text}
+                   onChange={(val) => updateBlock(block.id, { text: val })}
+                   readOnly={readOnly}
+                   placeholder="Banner Title"
+                   align="center"
+                />
+             </div>
+             
+             {/* Resize Handle (Height Only) */}
+             {isSelected && (
+                <div 
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-8 bg-white border border-indigo-600 rounded-full flex items-center justify-center cursor-ns-resize shadow-md -mb-4 z-30"
+                  onMouseDown={(e) => {
+                     e.stopPropagation();
+                     setResizingState({
+                        blockId: block.id,
+                        handle: 's', 
+                        startX: e.clientX,
+                        startY: e.clientY,
+                        startWidth: 0, 
+                        startHeight: block.content.height || 250
+                     });
+                  }}
+                >
+                  <ArrowDown className="h-4 w-4 text-indigo-600" />
+                </div>
+             )}
+          </div>
+        );
+
       default:
         return <div>Unknown Block</div>;
     }
@@ -963,6 +1031,35 @@ const AdminInteractiveDesigner: React.FC = () => {
            </div>
         )}
 
+        {/* Banner Specific */}
+        {block.type === 'banner' && (
+           <div className="space-y-4">
+              <div>
+                 <label className="block text-xs font-bold text-slate-600 mb-2">Background Image</label>
+                 <input 
+                   type="text" 
+                   value={block.content.url}
+                   onChange={(e) => updateBlock(block.id, { url: e.target.value })}
+                   className="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-900 outline-none mb-2"
+                   placeholder="https://..."
+                 />
+                 <label className="flex items-center justify-center gap-2 w-full py-2 bg-white border border-dashed border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 text-xs text-slate-600 font-medium">
+                    <Upload className="h-3 w-3" /> Upload New Image
+                    <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUploadForBlock(e, block.id)} />
+                 </label>
+              </div>
+              <div>
+                 <label className="block text-xs font-bold text-slate-600 mb-2">Height (px)</label>
+                 <input 
+                   type="number" 
+                   value={block.content.height || 250}
+                   onChange={(e) => updateBlock(block.id, { height: Number(e.target.value) })}
+                   className="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-900 outline-none"
+                 />
+              </div>
+           </div>
+        )}
+
         {/* Process Specific */}
         {block.type === 'process' && (
            <div className="space-y-4">
@@ -1115,6 +1212,10 @@ const AdminInteractiveDesigner: React.FC = () => {
                               <div className="h-6 w-full flex items-center px-2"><div className="w-full h-0.5 bg-current"></div></div>
                               <span className="text-xs font-bold">Divider</span>
                           </button>
+                          <button onClick={() => addBlock('banner')} className="p-4 border border-slate-200 bg-white rounded-xl hover:border-indigo-500 hover:text-indigo-600 flex flex-col items-center gap-2 transition-all shadow-sm col-span-2">
+                              <RectangleHorizontal className="h-6 w-6" />
+                              <span className="text-xs font-bold">Banner (Full Width)</span>
+                          </button>
                       </div>
                   </div>
               );
@@ -1178,7 +1279,7 @@ const AdminInteractiveDesigner: React.FC = () => {
                           </button>
                           <button onClick={() => addBlock('embed')} className="p-4 border border-slate-200 bg-white rounded-lg hover:border-indigo-500 text-left shadow-sm hover:shadow-md transition-all">
                               <div className="flex items-center gap-2 mb-1">
-                                <Globe className="h-4 w-4 text-purple-500" />
+                                <Globe className="h-4 w-4 text-pink-500" />
                                 <span className="text-sm font-bold text-slate-700">Embed Iframe</span>
                               </div>
                               <p className="text-xs text-slate-500">Embed external content via URL.</p>
