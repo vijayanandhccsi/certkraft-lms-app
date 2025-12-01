@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import { Outlet, useNavigate, useLocation, NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, Map, Layers, Settings, LogOut, 
-  Bell, Search, Terminal, FileVideo, Users, ChevronRight, BookOpen, GraduationCap
+  Bell, Search, Terminal, FileVideo, Users, ChevronRight, BookOpen, GraduationCap,
+  Brain
 } from 'lucide-react';
 import Logo from '../../components/Logo';
 
@@ -28,6 +29,7 @@ const AdminLayout: React.FC = () => {
     { icon: BookOpen, label: 'Courses', path: '/admin/courses' },
     { icon: GraduationCap, label: 'Instructors', path: '/admin/instructors' },
     { icon: Layers, label: 'Course Content', path: '/admin/content' },
+    { icon: Brain, label: 'Interactive Designer', path: '/admin/interactive' },
     { icon: Terminal, label: 'Labs & Sessions', path: '/admin/labs' },
     { icon: FileVideo, label: 'Media Library', path: '/admin/media' },
     { icon: Users, label: 'Students', path: '/admin/students' },
@@ -38,7 +40,7 @@ const AdminLayout: React.FC = () => {
     const pathParts = location.pathname.split('/').filter(p => p);
     if (pathParts.length < 2) return 'Dashboard';
     const main = pathParts[1];
-    return main.charAt(0).toUpperCase() + main.slice(1);
+    return main.charAt(0).toUpperCase() + main.slice(1).replace(/-/g, ' ');
   };
 
 

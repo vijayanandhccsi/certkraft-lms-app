@@ -18,6 +18,8 @@ import AdminLabs from './pages/admin/AdminLabs';
 import AdminMediaLibrary from './pages/admin/AdminMediaLibrary';
 import AdminStudents from './pages/admin/AdminStudents'; 
 import AdminSettings from './pages/admin/AdminSettings'; // New Import
+import AdminInteractiveDesigner from './pages/admin/AdminInteractiveDesigner'; // New Import
+
 // Student Imports
 import StudentLayout from './pages/student/StudentLayout';
 import StudentDashboard from './pages/student/StudentDashboard';
@@ -86,6 +88,7 @@ const App: React.FC = () => {
                       <Route path="courses" element={<AdminCourses />} />
                       <Route path="instructors" element={<AdminInstructors />} />
                       <Route path="content" element={<AdminContent />} />
+                      <Route path="interactive" element={<AdminInteractiveDesigner />} />
                       <Route path="labs" element={<AdminLabs />} />
                       <Route path="media" element={<AdminMediaLibrary />} />
                       <Route path="students" element={<AdminStudents />} />
