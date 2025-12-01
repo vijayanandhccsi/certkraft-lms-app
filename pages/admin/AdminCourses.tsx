@@ -329,7 +329,7 @@ const AdminCourses: React.FC = () => {
                       >
                         <option value="">Select Instructor</option>
                         {instructors.map(inst => (
-                          <option key={inst.id} value={inst.id}>{inst.name} ({inst.role})</option>
+                          <option key={inst.id} value={inst.id}>{inst.name} ({inst.title})</option>
                         ))}
                       </select>
                    </div>

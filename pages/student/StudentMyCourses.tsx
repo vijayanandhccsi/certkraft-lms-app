@@ -19,7 +19,7 @@ const StudentMyCourses: React.FC = () => {
   // Resolve Enrolled Data
   const myCourses = enrolledCourses.map(enrollment => {
     const courseData = courses.find(c => c.id === enrollment.courseId);
-    return { ...enrollment, ...courseData };
+    return { ...courseData, ...enrollment };
   }).filter(c => c.title); // Remove undefined
 
   // Filtering Logic

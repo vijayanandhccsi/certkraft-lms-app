@@ -28,7 +28,7 @@ const StudentDashboard: React.FC = () => {
 
   const resolvedCourses = enrolledCourses.map(enrollment => {
     const course = courses.find(c => c.id === enrollment.courseId);
-    return { ...enrollment, ...course };
+    return { ...course, ...enrollment };
   }).filter(c => c.title); // Filter out undefined courses
 
   const filteredCourses = resolvedCourses.filter(c => {

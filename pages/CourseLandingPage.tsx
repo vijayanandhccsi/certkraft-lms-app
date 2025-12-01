@@ -42,7 +42,7 @@ const CourseLandingPage: React.FC = () => {
     }
   };
 
-  const videoUrl = getYoutubeEmbed(course.demoVideoUrl);
+  const videoUrl = getYoutubeEmbed(course.promoVideoUrl);
 
   return (
     <div className="bg-slate-50 min-h-screen font-sans">

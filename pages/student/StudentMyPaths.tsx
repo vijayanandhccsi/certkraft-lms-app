@@ -15,7 +15,7 @@ const StudentMyPaths: React.FC = () => {
   // Resolve Path Data
   const myPaths = enrolledPaths.map(ep => {
     const pathData = paths.find(p => p.id === ep.pathId);
-    return { ...ep, ...pathData };
+    return { ...pathData, ...ep };
   }).filter(p => p.title); // Ensure data integrity
 
   const filteredPaths = myPaths.filter(p => {
