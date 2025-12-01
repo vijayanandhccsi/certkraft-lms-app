@@ -3,9 +3,10 @@ import React from 'react';
 interface LogoProps {
   variant?: 'light' | 'dark'; // 'light' for dark backgrounds (footer), 'dark' for light backgrounds (navbar)
   className?: string;
+  collapsed?: boolean;
 }
 
-const Logo: React.FC<LogoProps> = ({ variant = 'dark', className = '' }) => {
+const Logo: React.FC<LogoProps> = ({ variant = 'dark', className = '', collapsed = false }) => {
   // Brand colors
   const certColor = '#00a0e3'; // Cyan Blue
   const kraftColor = '#3cb84d'; // Bright Green
@@ -16,7 +17,7 @@ const Logo: React.FC<LogoProps> = ({ variant = 'dark', className = '' }) => {
   const subtitleColor = variant === 'dark' ? '#64748b' : '#94a3b8';
 
   return (
-    <div className={`flex items-center gap-2.5 ${className}`}>
+    <div className={`flex items-center gap-2.5 ${className} ${collapsed ? 'justify-center' : ''}`}>
       {/* Icon Mark */}
       <div className="relative w-10 h-10 flex-shrink-0">
         <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
@@ -35,15 +36,17 @@ const Logo: React.FC<LogoProps> = ({ variant = 'dark', className = '' }) => {
       </div>
 
       {/* Text Wordmark */}
-      <div className="flex flex-col leading-none justify-center">
-        <div className="text-2xl font-bold tracking-tight" style={{ fontFamily: 'Inter, sans-serif' }}>
-          <span style={{ color: certColor }}>Cert</span>
-          <span style={{ color: kraftColor }}>Kraft</span>
+      {!collapsed && (
+        <div className="flex flex-col leading-none justify-center animate-fade-in">
+          <div className="text-2xl font-bold tracking-tight" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <span style={{ color: certColor }}>Cert</span>
+            <span style={{ color: kraftColor }}>Kraft</span>
+          </div>
+          <div className="text-[0.65rem] uppercase tracking-wide font-semibold mt-0.5" style={{ color: subtitleColor }}>
+            Certifications Online | Tech Labs
+          </div>
         </div>
-        <div className="text-[0.65rem] uppercase tracking-wide font-semibold mt-0.5" style={{ color: subtitleColor }}>
-          Certifications Online | Tech Labs
-        </div>
-      </div>
+      )}
     </div>
   );
 };

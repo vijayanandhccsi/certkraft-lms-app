@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Search, Loader2, Target, Clock, CheckCircle, Globe, Award, ShieldCheck, Terminal, Cpu, Database, Cloud, Lock, Play, ClipboardCheck, Layers, Trophy } from 'lucide-react';
 import AILearningPathGenerator from '../components/AILearningPathGenerator';
 import LearningPathsCarousel from '../components/LearningPathsCarousel';
+import CourseCard from '../components/CourseCard';
 import { LearningPathResponse } from '../types';
 import { generateLearningPath } from '../services/geminiService';
+import { useCourses } from '../contexts/CourseContext';
 
 // Tech Stack for Marquee
 const TECH_STACK = [
@@ -34,6 +36,14 @@ const Home: React.FC = () => {
   const [learningPath, setLearningPath] = useState<LearningPathResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [prompt, setPrompt] = useState('');
+  
+  // Get Courses from Context
+  const { courses } = useCourses();
+  
+  // Filter Published courses and take the latest 3
+  const featuredCourses = courses
+    .filter(c => c.status === 'Published')
+    .slice(0, 3); // Adjust number as needed
 
   const handleGeneratePath = async () => {
     if (!prompt.trim()) return;
@@ -258,6 +268,41 @@ const Home: React.FC = () => {
                 View All Learning Paths 
                 <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
             </Link>
+        </div>
+      </section>
+
+      {/* FEATURED COURSES SECTION (Newly Added) */}
+      <section className="py-24 bg-slate-50 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-end mb-12">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Featured Courses</h2>
+              <p className="text-slate-500 text-lg max-w-2xl">
+                Explore our newest individual courses. Expert-led, hands-on, and certification-aligned.
+              </p>
+            </div>
+            <Link to="/learning-paths" className="hidden md:inline-flex items-center gap-2 text-indigo-600 font-bold hover:text-indigo-800 transition-colors">
+               Explore Catalog <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          {featuredCourses.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredCourses.map(course => (
+                <CourseCard key={course.id} course={course} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16 bg-white rounded-2xl border border-slate-200">
+               <p className="text-slate-500">No new courses available at the moment. Check back soon!</p>
+            </div>
+          )}
+          
+          <div className="mt-12 text-center md:hidden">
+             <Link to="/learning-paths" className="inline-block bg-white border border-slate-200 text-slate-700 font-bold px-6 py-3 rounded-xl hover:bg-slate-50 transition-colors shadow-sm">
+                View All Courses
+             </Link>
+          </div>
         </div>
       </section>
       

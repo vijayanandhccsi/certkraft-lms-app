@@ -5,7 +5,7 @@ import {
   Youtube, List, HelpCircle, X, CheckCircle, Eye, ExternalLink,
   Sparkles, Loader2, Clock, Layers, Target, Tag, Globe, 
   BarChart, Layout, FolderPlus, FilePlus, GripVertical, ArrowUp, ArrowDown,
-  Terminal
+  Terminal, Box, MousePointer2
 } from 'lucide-react';
 import { useLearningPaths } from '../../contexts/LearningPathContext';
 import { useInstructors } from '../../contexts/InstructorContext';
@@ -676,11 +676,15 @@ const AdminCourses: React.FC = () => {
                                      lesson.type === 'Video' ? 'bg-blue-100 text-blue-600' :
                                      lesson.type === 'Quiz' ? 'bg-purple-100 text-purple-600' :
                                      lesson.type === 'Lab' ? 'bg-emerald-100 text-emerald-600' :
-                                     'bg-orange-100 text-orange-600'
+                                     lesson.type === 'SCORM' ? 'bg-orange-100 text-orange-600' :
+                                     lesson.type === 'Interactive Page' ? 'bg-pink-100 text-pink-600' :
+                                     'bg-slate-100 text-slate-600'
                                   }`}>
                                      {lesson.type === 'Video' ? <Video className="h-3 w-3" /> :
                                       lesson.type === 'Quiz' ? <HelpCircle className="h-3 w-3" /> :
                                       lesson.type === 'Lab' ? <Terminal className="h-3 w-3" /> :
+                                      lesson.type === 'SCORM' ? <Box className="h-3 w-3" /> :
+                                      lesson.type === 'Interactive Page' ? <MousePointer2 className="h-3 w-3" /> :
                                       <BookOpen className="h-3 w-3" />}
                                   </div>
 

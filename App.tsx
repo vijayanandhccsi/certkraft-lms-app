@@ -88,11 +88,11 @@ const App: React.FC = () => {
                       <Route path="courses" element={<AdminCourses />} />
                       <Route path="instructors" element={<AdminInstructors />} />
                       <Route path="content" element={<AdminContent />} />
-                      <Route path="interactive" element={<AdminInteractiveDesigner />} />
                       <Route path="labs" element={<AdminLabs />} />
                       <Route path="media" element={<AdminMediaLibrary />} />
                       <Route path="students" element={<AdminStudents />} />
                       <Route path="settings" element={<AdminSettings />} />
+                      <Route path="interactive" element={<AdminInteractiveDesigner />} />
                     </Route>
                   </Routes>
                 </div>
