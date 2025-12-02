@@ -89,20 +89,59 @@ const StudentCoursePlayer: React.FC = () => {
          
          {/* Main Content Area */}
          <div className="flex-1 flex flex-col relative overflow-y-auto">
-            <div className="flex-1 bg-black flex items-center justify-center relative group">
+            <div className="flex-1 bg-black flex items-center justify-center relative group overflow-hidden">
                {/* Content Placeholder based on Type */}
                {activeLesson?.type === 'Video' ? (
-                  <div className="text-center">
-                     <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20 mb-4 mx-auto group-hover:scale-110 transition-transform cursor-pointer">
-                        <Play className="h-8 w-8 text-white fill-current" />
-                     </div>
-                     <p className="font-medium text-slate-400">Video Player Placeholder</p>
+                  <div className="w-full h-full bg-black flex items-center justify-center">
+                     {activeLesson.content ? (
+                        // Check if content is a blob URL or a direct video link, otherwise assume iframe/embed
+                        activeLesson.content.startsWith('blob:') || activeLesson.content.match(/\.(mp4|webm|ogg)$/i) ? (
+                           <video 
+                              controls 
+                              className="w-full h-full max-h-[80vh]" 
+                              src={activeLesson.content}
+                              controlsList="nodownload"
+                           >
+                              Your browser does not support the video tag.
+                           </video>
+                        ) : (
+                           // Assume embeddable URL (YouTube etc)
+                           <iframe
+                              src={activeLesson.content.includes('watch?v=') ? activeLesson.content.replace('watch?v=', 'embed/') : activeLesson.content}
+                              className="w-full h-full border-0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              title={activeLesson.title}
+                           />
+                        )
+                     ) : (
+                        <div className="text-center text-slate-500">
+                            <Play className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                            <p>No video content available</p>
+                        </div>
+                     )}
                   </div>
                ) : activeLesson?.type === 'Quiz' ? (
                   <div className="text-center p-8 bg-slate-800 rounded-2xl border border-slate-700 max-w-md">
                      <HelpCircle className="h-12 w-12 text-indigo-400 mx-auto mb-4" />
                      <h3 className="text-xl font-bold text-white mb-2">Quiz: {activeLesson.title}</h3>
                      <button className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold mt-4 hover:bg-indigo-500">Start Quiz</button>
+                  </div>
+               ) : activeLesson?.type === 'HTML' ? (
+                  <div className="w-full h-full bg-white">
+                      {activeLesson.content ? (
+                        <iframe 
+                            src={activeLesson.content} 
+                            className="w-full h-full border-0"
+                            title="Interactive Content"
+                            sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-modals"
+                            allowFullScreen
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full text-slate-500">
+                            <p>No content file uploaded.</p>
+                        </div>
+                      )}
                   </div>
                ) : (
                   <div className="text-center text-slate-500">

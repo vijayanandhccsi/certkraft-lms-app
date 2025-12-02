@@ -5,7 +5,7 @@ import {
   Youtube, List, HelpCircle, X, CheckCircle, Eye, ExternalLink,
   Sparkles, Loader2, Clock, Layers, Target, Tag, Globe, 
   BarChart, Layout, FolderPlus, FilePlus, GripVertical, ArrowUp, ArrowDown,
-  Terminal, Box, MousePointer2
+  Terminal, Box, MousePointer2, Upload
 } from 'lucide-react';
 import { useLearningPaths } from '../../contexts/LearningPathContext';
 import { useInstructors } from '../../contexts/InstructorContext';
@@ -218,6 +218,32 @@ const AdminCourses: React.FC = () => {
     setCurrentCourse({ ...currentCourse, modules: newModules });
   };
 
+  const handleHtmlUpload = (e: React.ChangeEvent<HTMLInputElement>, modIndex: number, lessonIndex: number) => {
+    if (e.target.files && e.target.files[0] && currentCourse) {
+      const file = e.target.files[0];
+      const fileUrl = URL.createObjectURL(file);
+      
+      const newModules = [...currentCourse.modules];
+      newModules[modIndex].lessons[lessonIndex].content = fileUrl;
+      newModules[modIndex].lessons[lessonIndex].fileName = file.name;
+      
+      setCurrentCourse({ ...currentCourse, modules: newModules });
+    }
+  };
+
+  const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>, modIndex: number, lessonIndex: number) => {
+    if (e.target.files && e.target.files[0] && currentCourse) {
+      const file = e.target.files[0];
+      const fileUrl = URL.createObjectURL(file);
+      
+      const newModules = [...currentCourse.modules];
+      newModules[modIndex].lessons[lessonIndex].content = fileUrl;
+      newModules[modIndex].lessons[lessonIndex].fileName = file.name;
+      
+      setCurrentCourse({ ...currentCourse, modules: newModules });
+    }
+  };
+
   // --- EDITOR RENDER ---
   if (isEditing && currentCourse) {
     return (
@@ -242,7 +268,7 @@ const AdminCourses: React.FC = () => {
         <div className="flex border-b border-slate-200 px-4 bg-white overflow-x-auto">
            {[
              { id: 'basic', label: 'Basic Info', icon: FileText },
-             { id: 'media', label: 'Media', icon: ImageIcon }, // Fixed: icon: ImageIcon instead of Image
+             { id: 'media', label: 'Media', icon: ImageIcon },
              { id: 'details', label: 'Details & SEO', icon: BookOpen },
              { id: 'structure', label: 'Structure', icon: Layers },
              { id: 'faq', label: 'FAQ', icon: HelpCircle }
@@ -668,7 +694,7 @@ const AdminCourses: React.FC = () => {
                          {/* Lessons List */}
                          <div className="p-4 space-y-2">
                             {module.lessons.map((lesson, lIndex) => (
-                               <div key={lesson.id} className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg group">
+                               <div key={lesson.id} className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg group flex-wrap md:flex-nowrap">
                                   <GripVertical className="h-4 w-4 text-slate-300 cursor-move" />
                                   
                                   {/* Type Icon */}
@@ -678,6 +704,7 @@ const AdminCourses: React.FC = () => {
                                      lesson.type === 'Lab' ? 'bg-emerald-100 text-emerald-600' :
                                      lesson.type === 'SCORM' ? 'bg-orange-100 text-orange-600' :
                                      lesson.type === 'Interactive Page' ? 'bg-pink-100 text-pink-600' :
+                                     lesson.type === 'HTML' ? 'bg-yellow-100 text-yellow-600' :
                                      'bg-slate-100 text-slate-600'
                                   }`}>
                                      {lesson.type === 'Video' ? <Video className="h-3 w-3" /> :
@@ -685,6 +712,7 @@ const AdminCourses: React.FC = () => {
                                       lesson.type === 'Lab' ? <Terminal className="h-3 w-3" /> :
                                       lesson.type === 'SCORM' ? <Box className="h-3 w-3" /> :
                                       lesson.type === 'Interactive Page' ? <MousePointer2 className="h-3 w-3" /> :
+                                      lesson.type === 'HTML' ? <FileText className="h-3 w-3" /> :
                                       <BookOpen className="h-3 w-3" />}
                                   </div>
 
@@ -692,7 +720,7 @@ const AdminCourses: React.FC = () => {
                                      type="text" 
                                      value={lesson.title}
                                      onChange={e => updateLesson(mIndex, lIndex, 'title', e.target.value)}
-                                     className="flex-1 bg-transparent text-sm text-slate-700 focus:bg-white border border-transparent focus:border-indigo-300 rounded px-2 py-1 outline-none"
+                                     className="flex-1 bg-transparent text-sm text-slate-700 focus:bg-white border border-transparent focus:border-indigo-300 rounded px-2 py-1 outline-none min-w-[150px]"
                                   />
 
                                   <input 
@@ -712,9 +740,61 @@ const AdminCourses: React.FC = () => {
                                      <option value="Lab">Lab</option>
                                      <option value="SCORM">SCORM</option>
                                      <option value="Interactive Page">Interactive Page</option>
+                                     <option value="HTML">HTML / Genially / Zip</option>
                                   </select>
 
-                                  <label className="flex items-center gap-1.5 cursor-pointer">
+                                  {/* HTML Upload Button */}
+                                  {lesson.type === 'HTML' && (
+                                    <div className="flex items-center gap-2">
+                                        <label className="cursor-pointer px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-colors flex items-center gap-1 whitespace-nowrap">
+                                            <Upload className="h-3 w-3" />
+                                            {lesson.fileName ? 'Change File' : 'Upload HTML/Zip'}
+                                            <input 
+                                                type="file" 
+                                                accept=".html,.zip" 
+                                                className="hidden" 
+                                                onChange={(e) => handleHtmlUpload(e, mIndex, lIndex)} 
+                                            />
+                                        </label>
+                                        {lesson.fileName && (
+                                            <span className="text-xs text-slate-500 truncate max-w-[100px]" title={lesson.fileName}>
+                                                {lesson.fileName}
+                                            </span>
+                                        )}
+                                    </div>
+                                  )}
+
+                                  {/* Video Upload Button */}
+                                  {lesson.type === 'Video' && (
+                                    <div className="flex items-center gap-2">
+                                        <label className="cursor-pointer px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold hover:bg-blue-100 transition-colors flex items-center gap-1 whitespace-nowrap">
+                                            <Upload className="h-3 w-3" />
+                                            {lesson.fileName ? 'Change Video' : 'Upload Video'}
+                                            <input 
+                                                type="file" 
+                                                accept="video/*"
+                                                className="hidden" 
+                                                onChange={(e) => handleVideoUpload(e, mIndex, lIndex)} 
+                                            />
+                                        </label>
+                                        {lesson.fileName ? (
+                                            <span className="text-xs text-slate-500 truncate max-w-[100px]" title={lesson.fileName}>
+                                                {lesson.fileName}
+                                            </span>
+                                        ) : (
+                                            // Fallback/Alternative: URL input
+                                            <input 
+                                                type="text" 
+                                                placeholder="Or Video URL..."
+                                                value={lesson.content || ''}
+                                                onChange={(e) => updateLesson(mIndex, lIndex, 'content', e.target.value)}
+                                                className="bg-transparent text-xs text-slate-500 focus:bg-white border border-transparent focus:border-indigo-300 rounded px-2 py-1 outline-none w-24"
+                                            />
+                                        )}
+                                    </div>
+                                  )}
+
+                                  <label className="flex items-center gap-1.5 cursor-pointer ml-auto md:ml-0">
                                      <input 
                                        type="checkbox" 
                                        checked={lesson.isPreview} 

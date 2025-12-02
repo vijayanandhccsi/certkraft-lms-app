@@ -8,9 +8,11 @@ export interface FAQ {
 export interface CourseLesson {
   id: string;
   title: string;
-  type: 'Video' | 'Quiz' | 'Lab' | 'SCORM' | 'Interactive Page';
+  type: 'Video' | 'Quiz' | 'Lab' | 'SCORM' | 'Interactive Page' | 'HTML';
   duration: string;
   isPreview: boolean; // For free preview
+  content?: string; // URL for content (HTML file, etc.)
+  fileName?: string; // Display name for uploaded file
 }
 
 export interface CourseModule {
