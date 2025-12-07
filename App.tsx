@@ -36,6 +36,7 @@ import { InstructorProvider } from './contexts/InstructorContext';
 import { CourseProvider } from './contexts/CourseContext'; 
 import { StudentProvider } from './contexts/StudentContext'; 
 import { AdminStudentProvider } from './contexts/AdminStudentContext'; 
+import { AssessmentProvider } from './contexts/AssessmentContext';
 
 // Public Layout to include Navbar and Footer
 const PublicLayout = () => (
@@ -55,51 +56,53 @@ const App: React.FC = () => {
         <CourseProvider>
           <StudentProvider>
             <AdminStudentProvider>
-              <HashRouter>
-                <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-700 flex flex-col">
-                  <Routes>
-                    {/* Public Routes */}
-                    <Route element={<PublicLayout />}>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/learning-paths" element={<LearningPaths />} />
-                      <Route path="/courses/:courseId" element={<CourseLandingPage />} /> 
-                    </Route>
+              <AssessmentProvider>
+                <HashRouter>
+                  <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-700 flex flex-col">
+                    <Routes>
+                      {/* Public Routes */}
+                      <Route element={<PublicLayout />}>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/learning-paths" element={<LearningPaths />} />
+                        <Route path="/courses/:courseId" element={<CourseLandingPage />} /> 
+                      </Route>
 
-                    {/* Auth Routes */}
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<Signup />} />
+                      {/* Auth Routes */}
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/signup" element={<Signup />} />
 
-                    {/* Student Routes */}
-                    <Route path="/student" element={<StudentLayout />}>
-                      <Route index element={<StudentDashboard />} />
-                      <Route path="dashboard" element={<StudentDashboard />} />
-                      <Route path="paths" element={<StudentMyPaths />} />
-                      <Route path="paths/:id" element={<StudentPathView />} />
-                      <Route path="courses" element={<StudentMyCourses />} />
-                      <Route path="certificates" element={<StudentCertificates />} /> 
-                    </Route>
-                    {/* Dedicated Player Route (No Layout) */}
-                    <Route path="/student/courses/:courseId" element={<StudentCoursePlayer />} />
+                      {/* Student Routes */}
+                      <Route path="/student" element={<StudentLayout />}>
+                        <Route index element={<StudentDashboard />} />
+                        <Route path="dashboard" element={<StudentDashboard />} />
+                        <Route path="paths" element={<StudentMyPaths />} />
+                        <Route path="paths/:id" element={<StudentPathView />} />
+                        <Route path="courses" element={<StudentMyCourses />} />
+                        <Route path="certificates" element={<StudentCertificates />} /> 
+                      </Route>
+                      {/* Dedicated Player Route (No Layout) */}
+                      <Route path="/student/courses/:courseId" element={<StudentCoursePlayer />} />
 
-                    {/* Admin Routes */}
-                    <Route path="/admin/login" element={<AdminLogin />} />
-                    <Route path="/admin" element={<AdminLayout />}>
-                      <Route index element={<AdminDashboard />} />
-                      <Route path="dashboard" element={<AdminDashboard />} />
-                      <Route path="paths" element={<AdminLearningPaths />} />
-                      <Route path="courses" element={<AdminCourses />} />
-                      <Route path="instructors" element={<AdminInstructors />} />
-                      <Route path="content" element={<AdminContent />} />
-                      <Route path="assessments" element={<AdminAssessments />} />
-                      <Route path="labs" element={<AdminLabs />} />
-                      <Route path="media" element={<AdminMediaLibrary />} />
-                      <Route path="students" element={<AdminStudents />} />
-                      <Route path="settings" element={<AdminSettings />} />
-                      <Route path="interactive" element={<AdminInteractiveDesigner />} />
-                    </Route>
-                  </Routes>
-                </div>
-              </HashRouter>
+                      {/* Admin Routes */}
+                      <Route path="/admin/login" element={<AdminLogin />} />
+                      <Route path="/admin" element={<AdminLayout />}>
+                        <Route index element={<AdminDashboard />} />
+                        <Route path="dashboard" element={<AdminDashboard />} />
+                        <Route path="paths" element={<AdminLearningPaths />} />
+                        <Route path="courses" element={<AdminCourses />} />
+                        <Route path="instructors" element={<AdminInstructors />} />
+                        <Route path="content" element={<AdminContent />} />
+                        <Route path="assessments" element={<AdminAssessments />} />
+                        <Route path="labs" element={<AdminLabs />} />
+                        <Route path="media" element={<AdminMediaLibrary />} />
+                        <Route path="students" element={<AdminStudents />} />
+                        <Route path="settings" element={<AdminSettings />} />
+                        <Route path="interactive" element={<AdminInteractiveDesigner />} />
+                      </Route>
+                    </Routes>
+                  </div>
+                </HashRouter>
+              </AssessmentProvider>
             </AdminStudentProvider>
           </StudentProvider>
         </CourseProvider>
