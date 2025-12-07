@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { HashRouter, Routes, Route, Outlet } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -19,6 +20,7 @@ import AdminMediaLibrary from './pages/admin/AdminMediaLibrary';
 import AdminStudents from './pages/admin/AdminStudents'; 
 import AdminSettings from './pages/admin/AdminSettings'; // New Import
 import AdminInteractiveDesigner from './pages/admin/AdminInteractiveDesigner'; // New Import
+import AdminAssessments from './pages/admin/AdminAssessments'; // New Import
 
 // Student Imports
 import StudentLayout from './pages/student/StudentLayout';
@@ -88,6 +90,7 @@ const App: React.FC = () => {
                       <Route path="courses" element={<AdminCourses />} />
                       <Route path="instructors" element={<AdminInstructors />} />
                       <Route path="content" element={<AdminContent />} />
+                      <Route path="assessments" element={<AdminAssessments />} />
                       <Route path="labs" element={<AdminLabs />} />
                       <Route path="media" element={<AdminMediaLibrary />} />
                       <Route path="students" element={<AdminStudents />} />

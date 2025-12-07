@@ -1,9 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation, NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, Map, Layers, Settings, LogOut, 
   Bell, Search, Terminal, FileVideo, Users, ChevronRight, BookOpen, GraduationCap,
-  Brain, ChevronDown, PieChart, Shield, PanelLeftClose, PanelLeftOpen, MousePointer2, Image
+  Brain, ChevronDown, PieChart, Shield, PanelLeftClose, PanelLeftOpen, MousePointer2, Image,
+  CheckSquare
 } from 'lucide-react';
 import Logo from '../../components/Logo';
 
@@ -35,6 +37,7 @@ const NAVIGATION: NavItem[] = [
     icon: Layers,
     children: [
       { label: 'Content Tools', path: '/admin/content', icon: FileVideo },
+      { label: 'Assessment Builder', path: '/admin/assessments', icon: CheckSquare },
       { label: 'Interactive Designer', path: '/admin/interactive', icon: MousePointer2 },
       { label: 'Media Library', path: '/admin/media', icon: Image },
     ]
