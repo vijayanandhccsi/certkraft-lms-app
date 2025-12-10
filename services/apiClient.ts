@@ -1,11 +1,14 @@
-
 import axios from 'axios';
+
+// Determine Base URL
+// In production (VPS/Domain), use relative path '/api' so Nginx handles the proxy.
+// In local development (localhost), point directly to the Node server port.
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const baseURL = isLocal ? 'http://localhost:3000/api' : '/api';
 
 // Create Axios instance
 const api = axios.create({
-  // In production (VPS), we use relative path '/api' so Nginx proxies it to the backend port.
-  // In local development, we might point to localhost:3000 explicitly if not using a proxy.
-  baseURL: process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/api', 
+  baseURL, 
   headers: {
     'Content-Type': 'application/json',
   },
