@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2/promise');
@@ -17,7 +16,7 @@ const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || 'password',
-  database: process.env.DB_NAME || 'certkraft_lms',
+  database: process.env.DB_NAME || 'certkraft', // Updated to match user DB
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
@@ -46,6 +45,7 @@ app.get('/api/courses', async (req, res) => {
     const [rows] = await pool.query('SELECT * FROM courses WHERE status = "Published"');
     res.json(rows);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -69,34 +69,34 @@ app.get('/api/courses/:id', async (req, res) => {
     result.modules = modules;
     res.json(result);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: error.message });
   }
 });
 
 // Mock Auth Login (Replace with real JWT/BCrypt in production)
 app.post('/api/auth/login', async (req, res) => {
-  const { email, password } = req.body;
-  // This is a simple query. In production, use bcrypt.compare(password, row.password_hash)
-  const [users] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
-  
-  if (users.length > 0) {
-    const user = users[0];
-    // Allow basic login for demo purposes if password matches (plain text check for demo only!)
-    // if (user.password_hash === password) ...
+  const { email } = req.body;
+  try {
+    const [users] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
     
-    res.json({ 
-      token: 'mock-jwt-token-' + user.id,
-      user: { id: user.id, name: user.name, email: user.email, role: user.role }
-    });
-  } else {
-    res.status(401).json({ message: 'Invalid credentials' });
+    if (users.length > 0) {
+      const user = users[0];
+      res.json({ 
+        token: 'mock-jwt-token-' + user.id,
+        user: { id: user.id, name: user.name, email: user.email, role: user.role }
+      });
+    } else {
+      res.status(401).json({ message: 'Invalid credentials' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Login error' });
   }
 });
 
-// Student Profile (Mock Implementation for context compatibility)
+// Student Profile (Mock Implementation)
 app.get('/api/me/profile', (req, res) => {
-  // In a real app, extract User ID from JWT in headers
-  // For now, return a structure matching the StudentContext expectation
   res.json({
     student: { id: 1, name: 'Demo Student', email: 'student@demo.com', role: 'Student', avatar: '' },
     stats: { totalHours: 10, labsCompleted: 2, certificatesEarned: 0, badges: [], currentStreak: 1 },
@@ -106,7 +106,6 @@ app.get('/api/me/profile', (req, res) => {
 });
 
 // Serve Static Frontend (Production Mode)
-// If Nginx is handling this, this part isn't strictly necessary but good for fallback
 app.use(express.static(path.join(__dirname, '../dist')));
 
 app.get('*', (req, res) => {
