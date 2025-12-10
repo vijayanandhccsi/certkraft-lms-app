@@ -2,6 +2,8 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 
+console.log('--- Index.tsx Executing ---');
+
 // Simple Error Boundary to catch render errors
 class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: Error | null}> {
   constructor(props: {children: React.ReactNode}) {
@@ -24,7 +26,7 @@ class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasErr
           padding: '40px', 
           fontFamily: 'sans-serif', 
           backgroundColor: '#fef2f2', 
-          color: '#991b1b', 
+          color: '#991b1b',
           minHeight: '100vh',
           display: 'flex',
           flexDirection: 'column',
@@ -69,13 +71,25 @@ class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasErr
 
 const rootElement = document.getElementById('root');
 
-if (rootElement) {
-  const root = createRoot(rootElement);
-  root.render(
-    <React.StrictMode>
-      <ErrorBoundary>
-        <App />
-      </ErrorBoundary>
-    </React.StrictMode>
-  );
+if (!rootElement) {
+  console.error('FATAL ERROR: Could not find root element with id "root"');
+} else {
+  console.log('Root element found, attempting to mount React app...');
+  try {
+    const root = createRoot(rootElement);
+    root.render(
+      <React.StrictMode>
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>
+      </React.StrictMode>
+    );
+    console.log('React.render called successfully.');
+  } catch (error) {
+    console.error('ERROR during React mount:', error);
+    // Attempt to render error to DOM if createRoot failed partially or logical error occurred before React took over
+    if (rootElement) {
+        rootElement.innerHTML = `<div style="color:red; padding: 20px;"><h3>Failed to mount application</h3><pre>${error}</pre></div>`;
+    }
+  }
 }

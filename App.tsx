@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { HashRouter, Routes, Route, Outlet } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -57,7 +57,7 @@ const App: React.FC = () => {
           <StudentProvider>
             <AdminStudentProvider>
               <AssessmentProvider>
-                <BrowserRouter>
+                <HashRouter>
                   <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-700 flex flex-col">
                     <Routes>
                       {/* Public Routes */}
@@ -101,7 +101,7 @@ const App: React.FC = () => {
                       </Route>
                     </Routes>
                   </div>
-                </BrowserRouter>
+                </HashRouter>
               </AssessmentProvider>
             </AdminStudentProvider>
           </StudentProvider>
