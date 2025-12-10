@@ -1,12 +1,13 @@
+
 import React from 'react';
-import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { HashRouter, Routes, Route, Outlet } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import LearningPaths from './pages/LearningPaths'; 
-import CourseLandingPage from './pages/CourseLandingPage'; 
-import Login from './pages/Login'; 
-import Signup from './pages/Signup'; 
+import CourseLandingPage from './pages/CourseLandingPage'; // Import public course page
+import Login from './pages/Login'; // Import Login page
+import Signup from './pages/Signup'; // Import Signup page
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -17,9 +18,9 @@ import AdminContent from './pages/admin/AdminContent';
 import AdminLabs from './pages/admin/AdminLabs';
 import AdminMediaLibrary from './pages/admin/AdminMediaLibrary';
 import AdminStudents from './pages/admin/AdminStudents'; 
-import AdminSettings from './pages/admin/AdminSettings'; 
-import AdminInteractiveDesigner from './pages/admin/AdminInteractiveDesigner'; 
-import AdminAssessments from './pages/admin/AdminAssessments'; 
+import AdminSettings from './pages/admin/AdminSettings'; // New Import
+import AdminInteractiveDesigner from './pages/admin/AdminInteractiveDesigner'; // New Import
+import AdminAssessments from './pages/admin/AdminAssessments'; // New Import
 
 // Student Imports
 import StudentLayout from './pages/student/StudentLayout';
@@ -56,7 +57,7 @@ const App: React.FC = () => {
           <StudentProvider>
             <AdminStudentProvider>
               <AssessmentProvider>
-                <BrowserRouter>
+                <HashRouter>
                   <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-700 flex flex-col">
                     <Routes>
                       {/* Public Routes */}
@@ -100,7 +101,7 @@ const App: React.FC = () => {
                       </Route>
                     </Routes>
                   </div>
-                </BrowserRouter>
+                </HashRouter>
               </AssessmentProvider>
             </AdminStudentProvider>
           </StudentProvider>
