@@ -6,9 +6,10 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: 'dist',
+    emptyOutDir: true,
   },
   define: {
-    // Polyfill process.env for the browser to prevent crashes if code uses it
+    // Polyfill process.env for the browser to prevent crashes if code uses it directly
     'process.env': {} 
   }
 });
