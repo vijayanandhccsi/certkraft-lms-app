@@ -1,9 +1,11 @@
+
 import axios from 'axios';
 
 // Create Axios instance
 const api = axios.create({
-  // Point to the local Node.js server
-  baseURL: 'http://localhost:3000/api', 
+  // In production (VPS), we use relative path '/api' so Nginx proxies it to the backend port.
+  // In local development, we might point to localhost:3000 explicitly if not using a proxy.
+  baseURL: process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/api', 
   headers: {
     'Content-Type': 'application/json',
   },
