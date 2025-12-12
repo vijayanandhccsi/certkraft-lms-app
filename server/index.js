@@ -12,11 +12,12 @@ app.use(cors());
 app.use(express.json());
 
 // Database Connection
+// Defaults updated to match production setup
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'password',
-  database: process.env.DB_NAME || 'certkraft', // Updated to match user DB
+  user: process.env.DB_USER || 'certkraft_master',
+  password: process.env.DB_PASSWORD || 'KkPy*JUTm#O6s',
+  database: process.env.DB_NAME || 'certkraft_db',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
@@ -106,6 +107,7 @@ app.get('/api/me/profile', (req, res) => {
 });
 
 // Serve Static Frontend (Production Mode)
+// NOTE: Nginx/Apache usually serves static files, but this acts as a fallback or for local testing
 app.use(express.static(path.join(__dirname, '../dist')));
 
 app.get('*', (req, res) => {
