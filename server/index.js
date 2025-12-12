@@ -5,14 +5,12 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Database Connection
-// Defaults updated to match production setup
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'certkraft_master',
@@ -26,11 +24,16 @@ const pool = mysql.createPool({
 // Check DB Connection
 pool.getConnection()
   .then(conn => {
-    console.log('✅ Connected to MySQL Database');
+    console.log('✅ Connected to MySQL Database:', process.env.DB_NAME);
     conn.release();
   })
   .catch(err => {
-    console.error('❌ Database connection failed:', err);
+    console.error('❌ Database connection failed:', err.message);
+    console.error('   Credentials used:', {
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        db: process.env.DB_NAME
+    });
   });
 
 // --- API ROUTES ---
@@ -107,13 +110,38 @@ app.get('/api/me/profile', (req, res) => {
 });
 
 // Serve Static Frontend (Production Mode)
-// NOTE: Nginx/Apache usually serves static files, but this acts as a fallback or for local testing
 app.use(express.static(path.join(__dirname, '../dist')));
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// --- SERVER STARTUP LOGIC ---
+
+const startServer = (port) => {
+  const server = app.listen(port, () => {
+    console.log(`\n🚀 Server running on port ${port}`);
+    console.log(`   Local: http://localhost:${port}`);
+    if (port === 80) {
+      console.log(`   Public: http://www.certkraft.com`);
+    } else {
+      console.log(`   Public: http://www.certkraft.com:${port}`);
+    }
+  });
+
+  server.on('error', (err) => {
+    if (err.code === 'EACCES' && port === 80) {
+      console.log('⚠️  Permission denied on port 80 (requires sudo). Falling back to port 3000...');
+      startServer(3000);
+    } else if (err.code === 'EADDRINUSE') {
+      console.log(`⚠️  Port ${port} is already in use. Trying ${port + 1}...`);
+      startServer(port + 1);
+    } else {
+      console.error('❌ Server error:', err);
+    }
+  });
+};
+
+// Try process.env.PORT, then 80, then default fallback logic will hit 3000
+const PREFERRED_PORT = process.env.PORT ? parseInt(process.env.PORT) : 80;
+startServer(PREFERRED_PORT);

@@ -2,10 +2,8 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { LearningPathResponse } from "../types";
 
 // Initialize Gemini Client
-// Using a safe accessor for the API Key to prevent 'process is not defined' errors in browser.
-// In a real production app, calls to Gemini should ideally go through your backend to hide the key.
-const apiKey = (import.meta as any).env?.VITE_API_KEY || ''; 
-const ai = new GoogleGenAI({ apiKey });
+// Using process.env.API_KEY as required by strict coding guidelines.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateLearningPath = async (careerGoal: string): Promise<LearningPathResponse | null> => {
   try {
