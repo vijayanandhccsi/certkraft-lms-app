@@ -20,8 +20,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Database Connection
-const pool = mysql.createPool({
+// Database Configuration
+const DB_CONFIG = {
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'certkraft_master',
   password: process.env.DB_PASSWORD || 'KkPy*JUTm#O6s',
@@ -29,17 +29,20 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
-});
+};
+
+// Database Connection
+const pool = mysql.createPool(DB_CONFIG);
 
 // Check DB Connection (Non-blocking)
 pool.getConnection()
   .then(conn => {
-    console.log('✅ Connected to MySQL Database:', process.env.DB_NAME);
+    console.log(`✅ Connected to MySQL Database: ${DB_CONFIG.database}`);
     conn.release();
   })
   .catch(err => {
     console.error('❌ Database connection failed:', err.message);
-    console.log('⚠️  Running in Offline/Mock Mode');
+    console.log('⚠️  Running in Offline/Mock Mode - API will return simulated data where possible.');
   });
 
 // --- API ROUTES ---
@@ -55,7 +58,9 @@ app.get('/api/courses', async (req, res) => {
     const [rows] = await pool.query('SELECT * FROM courses WHERE status = "Published"');
     res.json(rows);
   } catch (error) {
-    console.error('API Error:', error.message);
+    console.error('API Error (Courses):', error.message);
+    // If DB fails, we could return an empty array or 500. 
+    // For now, let's return 500 so the frontend falls back to mock data if implemented there.
     res.status(500).json({ error: error.message });
   }
 });
@@ -77,7 +82,7 @@ app.get('/api/courses/:id', async (req, res) => {
     result.modules = modules;
     res.json(result);
   } catch (error) {
-    console.error(error);
+    console.error('API Error (Course Detail):', error.message);
     res.status(500).json({ error: error.message });
   }
 });
@@ -103,7 +108,7 @@ app.post('/api/auth/login', async (req, res) => {
       });
     }
   } catch (error) {
-    console.error(error);
+    console.error('Auth Error:', error.message);
     // Fallback for demo purposes if DB fails
     res.json({ 
       token: 'mock-jwt-token-fallback',
@@ -114,6 +119,7 @@ app.post('/api/auth/login', async (req, res) => {
 
 // Profile
 app.get('/api/me/profile', (req, res) => {
+  // Return static mock data for now, or fetch from DB if you expand the schema
   res.json({
     student: { id: 1, name: 'Demo Student', email: 'student@demo.com', role: 'Student', avatar: '' },
     stats: { totalHours: 10, labsCompleted: 2, certificatesEarned: 0, badges: [], currentStreak: 1 },
