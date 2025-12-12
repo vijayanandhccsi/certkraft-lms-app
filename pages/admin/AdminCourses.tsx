@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Plus, Edit, Trash, Search, ChevronDown, ChevronRight, 
@@ -962,7 +963,7 @@ const AdminCourses: React.FC = () => {
                     </span>
                     <div className="flex items-center gap-1">
                        <button 
-                         onClick={() => window.open(`#/courses/${course.id}`, '_blank')}
+                         onClick={() => window.open(`/courses/${course.id}`, '_blank')}
                          className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                          title="Preview Public Page"
                        >
