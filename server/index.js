@@ -8,6 +8,8 @@ import { fileURLToPath } from 'url';
 // Initialize Environment Variables
 dotenv.config();
 
+console.log('Starting CertKraft LMS Server...');
+
 // Fix for __dirname in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,7 +39,7 @@ pool.getConnection()
   })
   .catch(err => {
     console.error('❌ Database connection failed:', err.message);
-    // Continue running the server even if DB fails, to serve the frontend
+    console.log('⚠️  Running in Offline/Mock Mode');
   });
 
 // --- API ROUTES ---
@@ -53,7 +55,7 @@ app.get('/api/courses', async (req, res) => {
     const [rows] = await pool.query('SELECT * FROM courses WHERE status = "Published"');
     res.json(rows);
   } catch (error) {
-    console.error(error);
+    console.error('API Error:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
@@ -121,7 +123,6 @@ app.get('/api/me/profile', (req, res) => {
 });
 
 // Serve Static Frontend (Production Mode)
-// Resolves to ../dist relative to server/index.js
 const distPath = path.join(__dirname, '../dist');
 app.use(express.static(distPath));
 
