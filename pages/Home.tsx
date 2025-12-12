@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, Search, Loader2, Target, Clock, CheckCircle, Globe, Award, ShieldCheck, Terminal, Cpu, Database, Cloud, Lock, Play, ClipboardCheck, Layers, Trophy } from 'lucide-react';
-import AILearningPathGenerator from '../components/AILearningPathGenerator';
+import { ArrowRight, Sparkles, Loader2, Target, Clock, Play, ClipboardCheck, Layers, Trophy, Cloud, Terminal, Cpu, Database, ShieldCheck, Globe, CheckCircle } from 'lucide-react';
 import LearningPathsCarousel from '../components/LearningPathsCarousel';
 import CourseCard from '../components/CourseCard';
 import { LearningPathResponse } from '../types';
@@ -38,12 +37,12 @@ const Home: React.FC = () => {
   const [prompt, setPrompt] = useState('');
   
   // Get Courses from Context
-  const { courses } = useCourses();
+  const { courses, isLoading: coursesLoading } = useCourses();
   
   // Filter Published courses and take the latest 3
   const featuredCourses = courses
     .filter(c => c.status === 'Published')
-    .slice(0, 3); // Adjust number as needed
+    .slice(0, 3);
 
   const handleGeneratePath = async () => {
     if (!prompt.trim()) return;
@@ -271,7 +270,7 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* FEATURED COURSES SECTION (Newly Added) */}
+      {/* FEATURED COURSES SECTION */}
       <section className="py-24 bg-slate-50 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-end mb-12">
@@ -286,7 +285,13 @@ const Home: React.FC = () => {
             </Link>
           </div>
 
-          {featuredCourses.length > 0 ? (
+          {coursesLoading ? (
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1,2,3].map(i => (
+                   <div key={i} className="bg-white rounded-xl h-96 animate-pulse border border-slate-200"></div>
+                ))}
+             </div>
+          ) : featuredCourses.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredCourses.map(course => (
                 <CourseCard key={course.id} course={course} />
@@ -294,7 +299,7 @@ const Home: React.FC = () => {
             </div>
           ) : (
             <div className="text-center py-16 bg-white rounded-2xl border border-slate-200">
-               <p className="text-slate-500">No new courses available at the moment. Check back soon!</p>
+               <p className="text-slate-500">No courses available at the moment. Check back soon!</p>
             </div>
           )}
           
@@ -391,13 +396,6 @@ const Home: React.FC = () => {
         }
         .animate-beam {
           animation: beam 4s linear infinite;
-        }
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
         }
       `}</style>
     </div>

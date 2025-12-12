@@ -1,40 +1,14 @@
-import dotenv from 'dotenv';
-import express from 'express';
-import cors from 'cors';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-// Initialize Environment Variables
-dotenv.config();
-
-console.log('Starting CertKraft LMS Server (NoSQL Mode)...');
-
-// Robust Path Resolution
-let __dirname = '';
-let projectRoot = '';
-
-try {
-  if (import.meta.url && import.meta.url.startsWith('file:')) {
-    const __filename = fileURLToPath(import.meta.url);
-    __dirname = path.dirname(__filename);
-    projectRoot = path.resolve(__dirname, '..');
-  } else {
-    throw new Error('Invalid import.meta.url');
-  }
-} catch (e) {
-  console.log('⚠️  Path resolution fallback: using process.cwd()');
-  projectRoot = process.cwd();
-  __dirname = path.join(projectRoot, 'server');
-}
+import { onRequest } from "firebase-functions/v2/https";
+import express from "express";
+import cors from "cors";
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: true }));
 app.use(express.json());
 
-// --- IN-MEMORY NOSQL DATABASE (Simulating Firestore) ---
-// This structure allows for easy migration to Firebase Firestore later.
+// --- IN-MEMORY NOSQL DATABASE (Mirrors server/index.js) ---
 const DB = {
   courses: [
     {
@@ -62,7 +36,6 @@ const DB = {
       whatIsIncluded: ['Videos', 'Labs', 'Practice Exams'],
       seo: { metaTitle: '', metaDescription: '', slug: 'aws-saa-c03' },
       faqs: [],
-      // Nested NoSQL Structure
       modules: [
         {
           id: 'mod_1',
@@ -144,7 +117,6 @@ const DB = {
   ]
 };
 
-// Helper for Standardized Response
 const sendResponse = (res, success, data = null, message = '') => {
   res.json({ success, data, message });
 };
@@ -152,69 +124,57 @@ const sendResponse = (res, success, data = null, message = '') => {
 // --- API ROUTES ---
 
 // Health Check
-app.get('/api/health', (req, res) => {
-  sendResponse(res, true, { timestamp: new Date(), mode: 'NoSQL-InMemory' }, 'System healthy');
+app.get('/health', (req, res) => {
+  sendResponse(res, true, { timestamp: new Date(), mode: 'Firebase Cloud Functions' }, 'System healthy');
 });
 
 // Get All Courses
-app.get('/api/courses', async (req, res) => {
+app.get('/courses', async (req, res) => {
   try {
-    // Simulate DB latency
-    // await new Promise(r => setTimeout(r, 200)); 
     const publishedCourses = DB.courses.filter(c => c.status === 'Published');
     sendResponse(res, true, publishedCourses, 'Courses retrieved successfully');
   } catch (error) {
-    console.error('API Error (Courses):', error.message);
     sendResponse(res, false, null, error.message);
   }
 });
 
 // Get Specific Course
-app.get('/api/courses/:id', async (req, res) => {
+app.get('/courses/:id', async (req, res) => {
   try {
     const courseId = parseInt(req.params.id);
     const course = DB.courses.find(c => c.id === courseId);
-    
-    if (!course) {
-      return sendResponse(res, false, null, 'Course not found');
-    }
-
+    if (!course) return sendResponse(res, false, null, 'Course not found');
     sendResponse(res, true, course, 'Course details retrieved');
   } catch (error) {
-    console.error('API Error (Course Detail):', error.message);
     sendResponse(res, false, null, error.message);
   }
 });
 
 // Mock Auth
-app.post('/api/auth/login', async (req, res) => {
+app.post('/auth/login', async (req, res) => {
   const { email } = req.body;
   try {
     const user = DB.users.find(u => u.email === email);
-    
     if (user) {
       sendResponse(res, true, { 
-        token: 'nosql-jwt-token-' + user.id,
+        token: 'firebase-jwt-' + user.id,
         user: user
       }, 'Login successful');
     } else {
-      // Auto-register mock
       const newUser = { id: Date.now(), name: 'New User', email, role: 'Student' };
       DB.users.push(newUser);
       sendResponse(res, true, { 
-        token: 'nosql-jwt-token-' + newUser.id,
+        token: 'firebase-jwt-' + newUser.id,
         user: newUser
       }, 'User registered and logged in');
     }
   } catch (error) {
-    console.error('Auth Error:', error.message);
     sendResponse(res, false, null, 'Login failed');
   }
 });
 
 // Profile
-app.get('/api/me/profile', (req, res) => {
-  // Static mock for now
+app.get('/me/profile', (req, res) => {
   const profileData = {
     student: { id: 1, name: 'Demo Student', email: 'student@demo.com', role: 'Student', avatar: '' },
     stats: { totalHours: 10, labsCompleted: 2, certificatesEarned: 0, badges: [], currentStreak: 1 },
@@ -224,40 +184,5 @@ app.get('/api/me/profile', (req, res) => {
   sendResponse(res, true, profileData, 'Profile retrieved');
 });
 
-// Serve Static Frontend (Production Mode)
-const distPath = path.join(projectRoot, 'dist');
-app.use(express.static(distPath));
-
-// Handle SPA Routing - send index.html for any unknown route
-app.get('*', (req, res) => {
-  // Don't intercept API routes
-  if (req.url.startsWith('/api')) {
-    return res.status(404).json({ success: false, message: 'API route not found' });
-  }
-  res.sendFile(path.join(distPath, 'index.html'));
-});
-
-// --- SERVER STARTUP ---
-
-const startServer = (port) => {
-  const server = app.listen(port, () => {
-    console.log(`\n🚀 CertKraft Server running on port ${port}`);
-    console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`   Database: In-Memory NoSQL (Ready for Firebase)`);
-  });
-
-  server.on('error', (err) => {
-    if (err.code === 'EACCES' && port === 80) {
-      console.log('⚠️  Permission denied on port 80. Attempting fallback to port 3000...');
-      startServer(3000);
-    } else if (err.code === 'EADDRINUSE') {
-      console.log(`⚠️  Port ${port} is in use. Trying ${port + 1}...`);
-      startServer(port + 1);
-    } else {
-      console.error('❌ Server error:', err);
-    }
-  });
-};
-
-const PREFERRED_PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
-startServer(PREFERRED_PORT);
+// Expose Express App as a Cloud Function
+export const api = onRequest(app);

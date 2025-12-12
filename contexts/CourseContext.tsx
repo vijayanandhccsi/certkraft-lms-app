@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import api from '../services/apiClient';
 
 export interface FAQ {
   question: string;
@@ -74,6 +75,7 @@ export interface Course {
 
 interface CourseContextType {
   courses: Course[];
+  isLoading: boolean;
   addCourse: (course: Course) => void;
   updateCourse: (course: Course) => void;
   deleteCourse: (id: number) => void;
@@ -81,9 +83,8 @@ interface CourseContextType {
 
 const CourseContext = createContext<CourseContextType | undefined>(undefined);
 
-export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Initialize with Mock Data for demonstration
-  const [courses, setCourses] = useState<Course[]>([
+// Initial Mock Data (Fallback)
+const MOCK_COURSES: Course[] = [
     {
       id: 101,
       title: 'AWS Certified Solutions Architect Associate',
@@ -165,22 +166,51 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       seo: { metaTitle: '', metaDescription: '', slug: 'jenkins-cicd' },
       faqs: []
     }
-  ]);
+];
+
+export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [courses, setCourses] = useState<Course[]>(MOCK_COURSES);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+        try {
+            const response = await api.get('/courses');
+            // Standard Response Format: { success: true, data: [...] }
+            if (response && response.data && response.data.success) {
+                if (Array.isArray(response.data.data) && response.data.data.length > 0) {
+                    setCourses(response.data.data);
+                }
+            } else {
+                console.warn("API connected but returned no data. Using local cache.");
+            }
+        } catch (error) {
+            console.log("Offline mode: Using cached course data.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    fetchCourses();
+  }, []);
 
   const addCourse = (course: Course) => {
     setCourses(prev => [...prev, course]);
+    // In production, also POST to API
   };
 
   const updateCourse = (updatedCourse: Course) => {
     setCourses(prev => prev.map(c => c.id === updatedCourse.id ? updatedCourse : c));
+    // In production, also PUT to API
   };
 
   const deleteCourse = (id: number) => {
     setCourses(prev => prev.filter(c => c.id !== id));
+    // In production, also DELETE from API
   };
 
   return (
-    <CourseContext.Provider value={{ courses, addCourse, updateCourse, deleteCourse }}>
+    <CourseContext.Provider value={{ courses, isLoading, addCourse, updateCourse, deleteCourse }}>
       {children}
     </CourseContext.Provider>
   );
